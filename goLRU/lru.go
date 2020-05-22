@@ -1,15 +1,10 @@
 package main
 
-import (
-	"fmt"
-	"sync"
-)
-
-var lock sync.RWMutex
+import "fmt"
 
 type Entry struct {
-	Key   string
-	Value interface{}
+	key   string
+	value interface{}
 	pre   *Entry
 	next  *Entry
 }
@@ -26,71 +21,61 @@ func NewCache(cap int) *Cache {
 }
 
 func (cache *Cache) Put(key string, value interface{}) interface{} {
-	lock.Lock()
-	defer lock.Unlock()
-
-	if val, ok := cache.cache[key]; ok {
-		cache.moveToHead(val)
-		return nil
+	if entry, ok := cache.cache[key]; ok {
+		cache.moveToHead(entry)
+		return value
 	}
 
-	e := &Entry{Key: key, Value: value, next: cache.head}
-
+	e := &Entry{key: key, value: value, next: cache.head}
 	if cache.head != nil {
 		cache.head.pre = e
 	}
-
 	cache.head = e
+	cache.cache[key] = e
 
 	if cache.tail == nil {
 		cache.tail = e
 	}
 
-	cache.cache[key] = e
+	if cache.capacity < len(cache.cache) {
+		delete(cache.cache, cache.tail.key)
+		cache.tail.pre.next = nil
+		cache.tail = cache.tail.pre
 
-	if len(cache.cache) <= cache.capacity {
-		return nil
+		return value
 	}
 
-	removedEntry := cache.tail
-	cache.tail = cache.tail.pre
-	removedEntry.pre = nil
-	cache.tail.next = nil
-	delete(cache.cache, removedEntry.Key)
-
-	return removedEntry.Value
+	return value
 }
 
 func (cache *Cache) Get(key string) interface{} {
-	lock.Lock()
-	defer lock.Unlock()
-
-	if val, ok := cache.cache[key]; ok {
-		cache.moveToHead(val)
-		return val.Value
+	if entry, ok := cache.cache[key]; ok {
+		cache.moveToHead(entry)
+		return entry.value
 	}
 
 	return nil
 }
 
-func (cache *Cache) moveToHead(e *Entry) {
-	if e == cache.head {
+func (cache *Cache) moveToHead(entry *Entry) {
+	if entry == cache.head {
 		return
 	}
 
-	e.pre.next = e.next
-	if e == cache.tail {
-		cache.tail = e.pre
+	entry.pre.next = entry.next
+
+	if entry == cache.tail {
+		cache.tail = entry.pre
 	} else {
-		e.next.pre = e.pre
+		entry.next.pre = entry.pre
 	}
 
-	e.pre = nil
+	cache.head.pre = entry
 
-	e.next = cache.head
-	cache.head.pre = e
+	entry.next = cache.head
+	entry.pre = nil
 
-	cache.head = e
+	cache.head = entry
 }
 
 func main() {
@@ -107,4 +92,5 @@ func main() {
 	cache.Put("2", "two")       // 放入元素three，总元素个数为3，因此最近最少使用的元素“3”会被删除
 	fmt.Println(cache.Get("3")) // 此处输出nil
 	fmt.Println(cache.Get("1")) // 此处输出one
+
 }
