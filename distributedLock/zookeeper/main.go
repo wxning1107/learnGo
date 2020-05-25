@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/samuel/go-zookeeper/zk"
-	"sync"
 	"time"
 )
 
@@ -21,7 +20,7 @@ type ZKLock struct {
 
 type ZKLocker interface {
 	Lock(path string) error
-	LockSlow(path string, sessionTimeOut time.Duration) error
+	Unlock() error
 }
 
 func NewZkLock(host []string) ZKLocker {
@@ -82,15 +81,7 @@ func (zkLock *ZKLock) Unlock() error {
 var counter int
 
 func main() {
-	var wg sync.WaitGroup
-	for i := 0; i < 1000; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			counter++
-		}()
-	}
-
-	wg.Wait()
-	println(counter)
+	lock := NewZkLock([]string{"127.0.0.1"})
+	lock.Lock("qqq")
+	lock.Unlock()
 }

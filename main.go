@@ -5,7 +5,6 @@ import "sync"
 var counter int
 
 func main() {
-	sync.Mutex{}
 	var wg sync.WaitGroup
 	var lock sync.Mutex
 	for i := 0; i < 1000; i++ {
