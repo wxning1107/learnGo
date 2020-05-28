@@ -1,22 +1,34 @@
 package main
 
-import "sync"
+import (
+	"errors"
+	"fmt"
+	"math/rand"
+	"time"
+)
 
-var counter int
+type In interface {
+	start() error
+}
+type test struct {
+	a In
+}
+type b struct {
+	aa int
+}
 
+func (b b) start() error {
+	b.aa = 2
+	return errors.New("bbb")
+}
 func main() {
-	var wg sync.WaitGroup
-	var lock sync.Mutex
-	for i := 0; i < 1000; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			lock.Lock()
-			counter++
-			lock.Unlock()
-		}()
-	}
-
-	wg.Wait()
-	println(counter)
+	//t := test{a:b{aa:1}}
+	//err := t.a.start()
+	//fmt.Println(err)
+	tt := b{aa: 1}
+	tt.start()
+	fmt.Println(tt.aa)
+	rand.Seed(time.Now().Unix())
+	fmt.Println(rand.Intn(100))
+	fmt.Println(rand.Intn(100))
 }
