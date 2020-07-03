@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 )
 
 type In interface {
@@ -9,9 +10,19 @@ type In interface {
 }
 
 func main() {
-	b := [2]int{6, 7}
-	b[1] = 9
-	fmt.Println(b)
-	a := map[string][2]int{"2": [2]int{1, 2}}
-	fmt.Println(a)
+	c := make(chan int, 5)
+	go func() {
+		for i := 0; i < 5; i++ {
+			c <- i
+		}
+		close(c)
+	}()
+
+	go func() {
+		for i := 0; i < 10; i++ {
+			fmt.Println(<-c)
+		}
+	}()
+
+	time.Sleep(time.Millisecond)
 }
