@@ -34,7 +34,9 @@ func main() {
 	c1 := GetConfig()
 	c2 := GetConfig()
 	fmt.Println(c1 == c2)
+
 	wc = nil
+
 	c3 := InitConfig()
 	c4 := InitConfig()
 	fmt.Println(c3 == c4)
