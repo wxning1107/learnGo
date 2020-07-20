@@ -14,7 +14,7 @@ type simpleExporter struct {
 func NewSimpleExporter(zone string) *simpleExporter {
 	return &simpleExporter{
 		zone:         zone,
-		OOMCountDesc: prometheus.NewDesc("clustermanager_oom_crashes_total", "Number of OOM crashes.", []string{"host"}, prometheus.Labels{"zone": zone}),
+		OOMCountDesc: prometheus.NewDesc("clustermanager_oom_crashes_total", "Number of OOM crashes.", []string{"host", "haha"}, prometheus.Labels{"zone": zone}),
 		RAMUsageDesc: prometheus.NewDesc("clustermanager_ram_usage_bytes", "RAM usage as reported to the cluster manager.", []string{"host"}, prometheus.Labels{"zone": zone}),
 	}
 }
@@ -39,7 +39,7 @@ func (se *simpleExporter) Describe(ch chan<- *prometheus.Desc) {
 func (se *simpleExporter) Collect(ch chan<- prometheus.Metric) {
 	oomCountByHost, ramUsageByHost := ScrapeData()
 	for host, oomCount := range oomCountByHost {
-		ch <- prometheus.MustNewConstMetric(se.OOMCountDesc, prometheus.CounterValue, float64(oomCount), host)
+		ch <- prometheus.MustNewConstMetric(se.OOMCountDesc, prometheus.CounterValue, float64(oomCount), host, "哈哈哈哈哈")
 	}
 
 	for host, ramUsage := range ramUsageByHost {
