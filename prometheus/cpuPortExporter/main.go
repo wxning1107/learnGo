@@ -1,30 +1,34 @@
 package main
 
 import (
+	"flag"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	logger "github.com/prometheus/common/log"
-	"learnGoSource/prometheus/simple/simpleExporter"
+	"learnGoSource/prometheus/cpuPortExporter/linuxExporter"
 	"log"
 	"net/http"
 )
 
-func init() {
-}
-
 func main() {
-	workerDB := simpleExporter.NewSimpleExporter("db")
-	//workerCA := simpleExporter.NewSimpleExporter("ca")
+	var port string
+	flag.StringVar(&port, "port", "8000", "Scrape port value")
+	flag.Parse()
+
+	exporter := linuxExporter.NewLinuxExporter(port, "linux")
 	reg := prometheus.NewPedanticRegistry()
-	reg.MustRegister(workerDB)
-	//reg.MustRegister(workerCA)
+	reg.MustRegister(exporter)
 
 	gatherers := prometheus.Gatherers{prometheus.DefaultGatherer, reg}
-	handler := promhttp.HandlerFor(gatherers, promhttp.HandlerOpts{ErrorLog: logger.NewErrorLogger(), ErrorHandling: promhttp.ContinueOnError})
+	handler := promhttp.HandlerFor(
+		gatherers,
+		promhttp.HandlerOpts{
+			ErrorLog:      logger.NewErrorLogger(),
+			ErrorHandling: promhttp.ContinueOnError,
+		})
 	http.HandleFunc("/metrics", func(w http.ResponseWriter, req *http.Request) {
 		handler.ServeHTTP(w, req)
 	})
+
 	log.Fatal(http.ListenAndServe(":1234", nil))
-	//http.Handle("/metrics", promhttp.Handler())
-	//log.Fatal(http.ListenAndServe(":1234", nil))
 }
