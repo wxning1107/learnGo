@@ -1,6 +1,7 @@
 package scrape
 
 import (
+	"github.com/prometheus/client_golang/prometheus"
 	"learnGoSource/prometheus/cpuPortExporter/common"
 	"log"
 	"math/rand"
@@ -54,7 +55,7 @@ func ScrapeCpuUsage() map[string]float64 {
 	return res
 }
 
-func ScrapeMacPort(port string) map[string]float64 {
+func ScrapeMacPort(port string, ch chan<- prometheus.Metric) map[string]float64 {
 	res := make(map[string]float64)
 	res[port] = float64(1)
 	return res

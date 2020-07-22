@@ -1,4 +1,4 @@
-package linuxExporter
+package LinuxExporter
 
 import (
 	"github.com/prometheus/client_golang/prometheus"
@@ -42,19 +42,19 @@ func (me *LinuxExporter) Describe(ch chan<- *prometheus.Desc) {
 }
 
 func (me *LinuxExporter) Collect(ch chan<- prometheus.Metric) {
-	//for port, hostStatus := range scrape.ScrapePortStatus(me.Port) {
-	//	ch <- prometheus.MustNewConstMetric(me.PortStatus, prometheus.CounterValue, hostStatus, port)
-	//}
-	//
-	//for CpuType, usage := range scrape.ScrapeCpuUsage() {
-	//	ch <- prometheus.MustNewConstMetric(me.CpuUsage, prometheus.CounterValue, usage, CpuType)
-	//}
-
-	// for test
-	for port, hostStatus := range scrape.ScrapeMacPort(me.Port) {
+	for port, hostStatus := range scrape.ScrapePortStatus(me.Port) {
 		ch <- prometheus.MustNewConstMetric(me.PortStatus, prometheus.CounterValue, hostStatus, port)
 	}
-	for cpu, usage := range scrape.ScrapeMacCpu() {
-		ch <- prometheus.MustNewConstMetric(me.CpuUsage, prometheus.CounterValue, usage, cpu)
+
+	for CpuType, usage := range scrape.ScrapeCpuUsage() {
+		ch <- prometheus.MustNewConstMetric(me.CpuUsage, prometheus.CounterValue, usage, CpuType)
 	}
+
+	// For test
+	//for port, hostStatus := range scrape.ScrapeMacPort(me.Port, ch) {
+	//	ch <- prometheus.MustNewConstMetric(me.PortStatus, prometheus.CounterValue, hostStatus, port)
+	//}
+	//for cpu, usage := range scrape.ScrapeMacCpu() {
+	//	ch <- prometheus.MustNewConstMetric(me.CpuUsage, prometheus.CounterValue, usage, cpu)
+	//}
 }

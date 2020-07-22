@@ -5,7 +5,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	logger "github.com/prometheus/common/log"
-	"learnGoSource/prometheus/cpuPortExporter/linuxExporter"
+	LinuxExporter "learnGoSource/prometheus/cpuPortExporter/linuxExporter"
 	"log"
 	"net/http"
 )
@@ -15,7 +15,7 @@ func main() {
 	flag.StringVar(&port, "port", "8000", "Scrape port value")
 	flag.Parse()
 
-	exporter := linuxExporter.NewLinuxExporter(port, "linux")
+	exporter := LinuxExporter.NewLinuxExporter(port, "linux")
 	reg := prometheus.NewPedanticRegistry()
 	reg.MustRegister(exporter)
 
