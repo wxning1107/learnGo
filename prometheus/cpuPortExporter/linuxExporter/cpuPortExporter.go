@@ -5,6 +5,11 @@ import (
 	"learnGoSource/prometheus/cpuPortExporter/scrape"
 )
 
+const (
+	NAMESPACE = "Linux"
+	SUBSYSTEM = "exporter"
+)
+
 type LinuxExporter struct {
 	OperationSystem string
 	Port            string
@@ -17,14 +22,14 @@ func NewLinuxExporter(port string, os string) prometheus.Collector {
 		OperationSystem: os,
 		Port:            port,
 		PortStatus: prometheus.NewDesc(
-			"port_status",
+			prometheus.BuildFQName(NAMESPACE, SUBSYSTEM, "port_status"),
 			"Scrape port status: 2 is ESTABLISHED, 1 is LISTEN.",
 			[]string{"port"},
 			prometheus.Labels{"os": os},
 		),
 		CpuUsage: prometheus.NewDesc(
-			"cpu_usage",
-			"Cpu usage",
+			prometheus.BuildFQName(NAMESPACE, SUBSYSTEM, "cpu_usage"),
+			"Cpu usage.",
 			[]string{"type"},
 			prometheus.Labels{"os": os},
 		),
@@ -44,6 +49,8 @@ func (me *LinuxExporter) Collect(ch chan<- prometheus.Metric) {
 	//for CpuType, usage := range scrape.ScrapeCpuUsage() {
 	//	ch <- prometheus.MustNewConstMetric(me.CpuUsage, prometheus.CounterValue, usage, CpuType)
 	//}
+
+	// for test
 	for port, hostStatus := range scrape.ScrapeMacPort(me.Port) {
 		ch <- prometheus.MustNewConstMetric(me.PortStatus, prometheus.CounterValue, hostStatus, port)
 	}
