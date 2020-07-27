@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"strings"
+	"time"
 )
 
 type In interface {
@@ -40,9 +40,9 @@ KiB Swap:   511996 total,   491160 free,    20836 used.  2185504 avail Mem
 
 func main() {
 	//fmt.Println(shell)
-	part := strings.Split(strings.Trim(shell, "\n"), "\n")[2]
-	fmt.Printf("%q\n", part)
-	fmt.Printf("%q\n", strings.Split(part, " "))
+	//part := strings.Split(strings.Trim(shell, "\n"), "\n")[2]
+	//fmt.Printf("%q\n", part)
+	//fmt.Printf("%q\n", strings.Split(part, " "))
 	//fmt.Println(strings.Split(strings.Trim(shell, "\n"), " ")[2])
 	//fmt.Println(strings.Replace(shell, " ", "", -1))
 	//fmt.Println(strings.Trim(shell, "\n"), "\n")
@@ -65,4 +65,13 @@ func main() {
 	//}()
 	//
 	//time.Sleep(time.Millisecond)
+
+	ch := make(chan struct{})
+	go func() {
+		ch <- struct{}{}
+		close(ch)
+	}()
+	time.Sleep(time.Second * 10)
+	v := <-ch
+	fmt.Println(v)
 }
