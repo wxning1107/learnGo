@@ -2,9 +2,9 @@ package main
 
 import (
 	"flag"
-	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	logger "github.com/prometheus/common/log"
+	"learnGoSource/prometheus/cpuPortExporter/common"
 	LinuxExporter "learnGoSource/prometheus/cpuPortExporter/linuxExporter"
 	"log"
 	"net/http"
@@ -16,12 +16,18 @@ func main() {
 	flag.Parse()
 
 	exporter := LinuxExporter.NewLinuxExporter(port, "linux")
-	reg := prometheus.NewPedanticRegistry()
-	reg.MustRegister(exporter)
+	//reg := prometheus.NewPedanticRegistry()
+	//reg.MustRegister(exporter)
+	//gatherers := prometheus.Gatherers{prometheus.DefaultGatherer, reg}
+	//handler := promhttp.HandlerFor(
+	//	gatherers,
+	//	promhttp.HandlerOpts{
+	//		ErrorLog:      logger.NewErrorLogger(),
+	//		ErrorHandling: promhttp.ContinueOnError,
+	//	})
 
-	gatherers := prometheus.Gatherers{prometheus.DefaultGatherer, reg}
 	handler := promhttp.HandlerFor(
-		gatherers,
+		common.InitExporter(exporter),
 		promhttp.HandlerOpts{
 			ErrorLog:      logger.NewErrorLogger(),
 			ErrorHandling: promhttp.ContinueOnError,

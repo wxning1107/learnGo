@@ -1,8 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
-	"time"
+	"strings"
 )
 
 type In interface {
@@ -66,12 +67,44 @@ func main() {
 	//
 	//time.Sleep(time.Millisecond)
 
-	ch := make(chan struct{})
-	go func() {
-		ch <- struct{}{}
-		close(ch)
-	}()
-	time.Sleep(time.Second * 10)
-	v := <-ch
-	fmt.Println(v)
+	//ch := make(chan struct{})
+	//go func() {
+	//	ch <- struct{}{}
+	//	close(ch)
+	//}()
+	//time.Sleep(time.Second * 10)
+	//v := <-ch
+	//fmt.Println(v)
+	a := "a"
+	b := "b"
+	fmt.Println(a + b)
+
+	fmt.Println(fmt.Sprintf("%s%s", a, b))
+
+	s := []string{a, b}
+	fmt.Println(strings.Join(s, ""))
+
+	var bb bytes.Buffer
+	bb.WriteString(a)
+	bb.WriteString(b)
+	fmt.Println(bb.String())
+
+	var cc strings.Builder
+	cc.WriteString(a)
+	cc.WriteString(b)
+	fmt.Println(cc.String())
+
+	sli := []int{2, 5, 7, 1, 9, 3, 4}
+	bubbleSort(sli)
+	fmt.Println(sli)
+}
+
+func bubbleSort(s []int) {
+	for i := 0; i < len(s)-1; i++ {
+		for j := 0; j < len(s)-i-1; j++ {
+			if s[j] > s[j+1] {
+				s[j+1], s[j] = s[j], s[j+1]
+			}
+		}
+	}
 }

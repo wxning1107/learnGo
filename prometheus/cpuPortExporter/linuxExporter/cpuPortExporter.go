@@ -54,39 +54,39 @@ func (me *LinuxExporter) Describe(ch chan<- *prometheus.Desc) {
 }
 
 func (me *LinuxExporter) Collect(ch chan<- prometheus.Metric) {
-	var wg sync.WaitGroup
-	wg.Add(2)
-	go func() {
-		for port, hostStatus := range scrape.ScrapePortStatus(me.Port) {
-			ch <- prometheus.MustNewConstMetric(me.PortStatus, prometheus.CounterValue, hostStatus, port)
-		}
-		wg.Done()
-	}()
-
-	go func() {
-		for CpuType, usage := range scrape.ScrapeCpuUsage() {
-			ch <- prometheus.MustNewConstMetric(me.CpuUsage, prometheus.CounterValue, usage, CpuType)
-		}
-		wg.Done()
-	}()
-	wg.Wait()
-
-	// For test
 	//var wg sync.WaitGroup
 	//wg.Add(2)
 	//go func() {
-	//	for port, hostStatus := range scrape.ScrapeMacPort(me.Port, ch) {
+	//	for port, hostStatus := range scrape.ScrapePortStatus(me.Port) {
 	//		ch <- prometheus.MustNewConstMetric(me.PortStatus, prometheus.CounterValue, hostStatus, port)
 	//	}
 	//	wg.Done()
 	//}()
 	//
 	//go func() {
-	//	for cpu, usage := range scrape.ScrapeMacCpu() {
-	//		ch <- prometheus.MustNewConstMetric(me.CpuUsage, prometheus.CounterValue, usage, cpu)
+	//	for CpuType, usage := range scrape.ScrapeCpuUsage() {
+	//		ch <- prometheus.MustNewConstMetric(me.CpuUsage, prometheus.CounterValue, usage, CpuType)
 	//	}
 	//	wg.Done()
 	//}()
+	//wg.Wait()
+
+	// For test
+	var wg sync.WaitGroup
+	wg.Add(2)
+	go func() {
+		for port, hostStatus := range scrape.ScrapeMacPort(me.Port, ch) {
+			ch <- prometheus.MustNewConstMetric(me.PortStatus, prometheus.CounterValue, hostStatus, port)
+		}
+		wg.Done()
+	}()
+
+	go func() {
+		for cpu, usage := range scrape.ScrapeMacCpu() {
+			ch <- prometheus.MustNewConstMetric(me.CpuUsage, prometheus.CounterValue, usage, cpu)
+		}
+		wg.Done()
+	}()
 
 	wg.Wait()
 }
