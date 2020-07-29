@@ -37,7 +37,7 @@ func NewLinuxExporter(port string, os string) prometheus.Collector {
 	}
 }
 
-func (me *LinuxExporter) Describe(ch chan<- *prometheus.Desc) {
+func (le *LinuxExporter) Describe(ch chan<- *prometheus.Desc) {
 	desc := make(chan prometheus.Metric)
 	doneChan := make(chan struct{})
 	go func() {
@@ -48,7 +48,7 @@ func (me *LinuxExporter) Describe(ch chan<- *prometheus.Desc) {
 		close(doneChan)
 	}()
 
-	me.Collect(desc)
+	le.Collect(desc)
 	close(desc)
 	<-doneChan
 }
