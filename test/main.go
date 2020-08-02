@@ -1,9 +1,10 @@
 package main
 
 import (
-	"bytes"
+	"bufio"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 )
@@ -36,14 +37,24 @@ func main() {
 	_ = json.Unmarshal(res, &cfg)
 	fmt.Printf("%v\n", cfg)
 
-	var buf bytes.Buffer
+	file, _ := os.Create("test.txt")
+	defer file.Close()
 	log.Printf("bbb")
-	file, _ := os.Open("file")
 	log.SetOutput(file)
 	log.Printf("aaa")
 	testLog()
-	fmt.Println(buf.String())
 
+	con, err := ioutil.ReadFile("test.txt")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("file content: %s\n", string(con))
+
+	f, _ := os.Open("test.txt")
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		fmt.Printf("scanner: %s\n", scanner.Text())
+	}
 }
 
 func testLog() {
