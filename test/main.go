@@ -55,6 +55,10 @@ func main() {
 	for scanner.Scan() {
 		fmt.Printf("scanner: %s\n", scanner.Text())
 	}
+
+	var fl float64
+	fl = 3.444
+	fmt.Println(int(fl))
 }
 
 func testLog() {
