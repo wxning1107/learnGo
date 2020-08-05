@@ -5,8 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"learnGoSource/utils"
 	"log"
 	"os"
+	"sync"
 )
 
 type config struct {
@@ -59,8 +61,54 @@ func main() {
 	var fl float64
 	fl = 3.444
 	fmt.Println(int(fl))
+
+	fmt.Println("start")
+	p := PrintNum()
+	for i := range p {
+		fmt.Println(i)
+	}
+	fmt.Println("stop")
+
+	fileSize, err := utils.GetFileSize("test.txt")
+	fmt.Println(fileSize)
+	fmt.Println(err)
+	f, err = os.Open("test.txt")
+	if err == nil {
+		stat, _ := f.Stat()
+		fmt.Println(stat.Size())
+	}
+	m := map[string]string{}
+	err = json.Unmarshal([]byte(""), m)
+	fmt.Println(err)
 }
 
 func testLog() {
 	log.Println("ccc")
+}
+
+func PrintNum() <-chan int {
+	var wg sync.WaitGroup
+	wg.Add(100)
+	res := make(chan int, 100)
+	ch := make(chan struct{}, 1)
+	for i := 1; i <= 100; i++ {
+		ch <- struct{}{}
+		if i%2 == 0 {
+			go func(i int) {
+				res <- i
+				<-ch
+				wg.Done()
+			}(i)
+		} else {
+			go func(i int) {
+				res <- i
+				<-ch
+				wg.Done()
+			}(i)
+		}
+	}
+	wg.Wait()
+	close(res)
+	close(ch)
+	return res
 }

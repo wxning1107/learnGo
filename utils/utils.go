@@ -12,3 +12,12 @@ func PathExist(path string) bool {
 	}
 	return true
 }
+
+func GetFileSize(path string) (int, error) {
+	fi, err := os.Stat(path)
+	if err == nil {
+		return int(fi.Size()), nil
+	}
+
+	return 0, err
+}
