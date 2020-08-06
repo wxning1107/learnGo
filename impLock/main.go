@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"sync"
 	"sync/atomic"
 )
@@ -39,6 +40,17 @@ func (rw *RWMutex) RUnlock() {
 	}
 }
 
-func main() {
+var sum int
 
+func main() {
+	var mu RWMutex
+	sum = 0
+	for i := 0; i < 1000; i++ {
+		mu.RLock()
+		go func() {
+			sum++
+		}()
+		mu.RUnlock()
+	}
+	fmt.Println(sum)
 }
