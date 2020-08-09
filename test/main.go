@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"sync"
+	"time"
 )
 
 type config struct {
@@ -80,6 +81,10 @@ func main() {
 	m := map[string]string{}
 	err = json.Unmarshal([]byte(""), m)
 	fmt.Println(err)
+
+	s := utils.JoinString("abc", "def")
+	fmt.Println(s)
+	ParseTStringToTime("2020.08.08", "2020.02.09")
 }
 
 func testLog() {
@@ -111,4 +116,13 @@ func PrintNum() <-chan int {
 	close(res)
 	close(ch)
 	return res
+}
+
+func ParseTStringToTime(s1, s2 string) {
+	t1, _ := time.Parse("2006-01-02", s1)
+	t2, _ := time.Parse("2006-01-02", s1)
+	t := t1.Sub(t2)
+	fmt.Println(t.Hours())
+	fmt.Println("```````````````````")
+	fmt.Println(t1.Day())
 }
