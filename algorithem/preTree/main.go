@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"strconv"
 )
 
 type Node struct {
@@ -22,7 +21,7 @@ func (t *Trie) Insert(word string) {
 		}
 		cur = cur.next[string(w)]
 	}
-	t.root.isWord = true
+	cur.isWord = true
 }
 
 func (t *Trie) Search(word string) bool {
@@ -37,13 +36,10 @@ func (t *Trie) Search(word string) bool {
 }
 
 func main() {
-	var i interface{}
-	i = int64(1)
-	strconv.Itoa(i.(int))
 	t := Trie{
 		root: &Node{next: make(map[string]*Node)},
 	}
-	t.Insert("wxning ")
+	t.Insert("wxning")
 	isWord := t.Search("wxning")
 	fmt.Println(isWord)
 }
