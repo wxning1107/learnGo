@@ -8,6 +8,7 @@ import (
 	"learnGoSource/utils"
 	"log"
 	"os"
+	"strings"
 	"sync"
 	"time"
 )
@@ -85,6 +86,7 @@ func main() {
 	s := utils.JoinString("abc", "def")
 	fmt.Println(s)
 	ParseTStringToTime("2020.08.08", "2020.02.09")
+	TestReplace()
 }
 
 func testLog() {
@@ -125,4 +127,11 @@ func ParseTStringToTime(s1, s2 string) {
 	fmt.Println(t.Hours())
 	fmt.Println("```````````````````")
 	fmt.Println(t1.Day())
+}
+
+func TestReplace() {
+	s := `{"name":"{{name}}", "age":"{{age}}"}`
+	replacer := strings.NewReplacer("{{name}}", "wxning")
+	res := replacer.Replace(s)
+	fmt.Println(res)
 }

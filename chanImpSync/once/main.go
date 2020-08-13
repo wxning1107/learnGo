@@ -26,6 +26,7 @@ func (o *Once) Do(f func()) {
 func main() {
 	once := NewOnce()
 	for i := 0; i < 10; i++ {
+		fmt.Println(i)
 		once.Do(func() {
 			fmt.Println("Hello once")
 		})

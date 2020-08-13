@@ -73,6 +73,28 @@ func BubbleSort(s []int) {
 	}
 }
 
+func MaxProfit(price []int) int {
+	maxProfit := 0
+	for i := 0; i < len(price)-1; i++ {
+		if price[i+1]-price[i] > 0 {
+			maxProfit += price[i+1] - price[i]
+		}
+	}
+	return maxProfit
+}
+
+func MaxProfitOneTranc(p []int) int {
+	MaxProfit := 0
+	for i := 0; i < len(p); i++ {
+
+	}
+
+	return MaxProfit
+}
+
 func main() {
 	printOddEven2()
+	maxProfit := MaxProfit([]int{7, 1, 5, 3, 4, 6, 10})
+	//maxProfit = MaxProfitOneTranc([]int{7, 1, 5, 3, 6, 4, 100})
+	fmt.Println(maxProfit)
 }
