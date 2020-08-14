@@ -7,6 +7,10 @@ import (
 	_ "net/http/pprof"
 )
 
+/**
+go tool pprof http://localhost:1234/debug/pprof/profile?seconds=60
+go tool pprof http://localhost:1234/debug/pprof/heap
+*/
 func main() {
 	go func() {
 		for {
