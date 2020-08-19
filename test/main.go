@@ -8,6 +8,7 @@ import (
 	"learnGoSource/utils"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 	"time"
@@ -87,6 +88,7 @@ func main() {
 	fmt.Println(s)
 	ParseTStringToTime("2020.08.08", "2020.02.09")
 	TestReplace()
+	fmt.Println(filepath.Join("home", ".kube", "config"))
 }
 
 func testLog() {
