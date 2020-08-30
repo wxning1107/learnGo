@@ -29,6 +29,7 @@ func prompt() {
 }
 
 func main() {
+	// env GOOS=linux GOARCH=amd64 go build -o deploymentV1.1 main.go
 	var kubeconfig *string
 	if home := homedir.HomeDir(); home != "" {
 		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
@@ -96,8 +97,8 @@ func main() {
 	fmt.Println("Updating deployment...")
 	retryErr := retry.RetryOnConflict(retry.DefaultRetry, func() error {
 		result, getErr := deploymentsClient.Get("demo-deployment", metav1.GetOptions{})
-		if err != nil {
-			panic(fmt.Errorf("Failed to get latest version of Deployment: %v", getErr))
+		if getErr != nil {
+			panic(fmt.Errorf("Failed to get latest version of Deployment: %v\n", getErr))
 		}
 		result.Spec.Replicas = pointer.Int32Ptr(1)
 		result.Spec.Template.Spec.Containers[0].Image = "nginx:1.13"
@@ -105,7 +106,7 @@ func main() {
 		return updateErr
 	})
 	if retryErr != nil {
-		panic(fmt.Errorf("Update failed: %v", retryErr))
+		panic(fmt.Errorf("Update failed: %v\n", retryErr))
 	}
 	fmt.Println("Updated deployment...")
 
