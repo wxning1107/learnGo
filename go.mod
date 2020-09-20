@@ -3,10 +3,12 @@ module learnGoSource
 go 1.14
 
 require (
+	github.com/evanphx/json-patch v4.9.0+incompatible // indirect
 	github.com/go-redis/redis v6.15.8+incompatible
 	github.com/google/go-cmp v0.5.1 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/googleapis/gnostic v0.5.1 // indirect
+	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/imdario/mergo v0.3.5 // indirect
 	github.com/onsi/ginkgo v0.0.0-20170829012221-11459a886d9c // indirect
 	github.com/onsi/gomega v0.0.0-20170829124025-dcabb60a477c // indirect
@@ -28,6 +30,7 @@ require (
 	k8s.io/api v0.17.0 // indirect
 	k8s.io/apimachinery v0.18.8
 	k8s.io/client-go v11.0.0+incompatible
+	k8s.io/kube-openapi v0.0.0-20200811211545-daf3cbb84823 // indirect
 	k8s.io/utils v0.0.0-20191114184206-e782cd3c129f // indirect
 	sigs.k8s.io/yaml v1.1.0 // indirect
 )

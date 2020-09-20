@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"reflect"
 	"strings"
 )
 
@@ -43,4 +44,17 @@ func JoinString(s1, s2 string) []string {
 	s7 := b2.String()
 
 	return []string{s3, s4, s5, s6, s7}
+}
+
+func IsInSlice(value, sli interface{}) bool {
+	switch reflect.TypeOf(sli).Kind() {
+	case reflect.Slice, reflect.Array:
+		s := reflect.ValueOf(sli)
+		for i := 0; i < s.Len(); i++ {
+			if reflect.DeepEqual(value, s.Index(i).Interface()) {
+				return true
+			}
+		}
+	}
+	return false
 }

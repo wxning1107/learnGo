@@ -36,6 +36,43 @@ func test2() {
 	}
 	time.Sleep(time.Second)
 }
+
+type Config struct {
+	gin  func(g *[]string)
+	name string
+	defaultConfig
+}
+type defaultConfig struct {
+	name string
+}
+
+func (d defaultConfig) get() {
+	panic("implement me")
+}
+
+func (d defaultConfig) set() {
+	panic("implement me")
+}
+
+type configInterface interface {
+	get()
+	set()
+}
+
 func main() {
-	test2()
+	c := Config{}
+	c.name = "abc"
+	c.gin = func(g *[]string) {
+		for i := 0; i < 10; i++ {
+			*g = append(*g, strconv.Itoa(i))
+			fmt.Println(g)
+		}
+	}
+
+	time.Sleep(time.Second)
+	g2 := []string{"a", "b"}
+	c.gin(&g2)
+	res := fmt.Sprintf("%.1f", 1.222)
+	fmt.Println(res)
+
 }
