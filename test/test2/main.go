@@ -2,6 +2,8 @@ package main
 
 import (
 	"bytes"
+	"fmt"
+	"learnGoSource/utils"
 	"os"
 )
 
@@ -13,4 +15,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println()
+	src := []string{"b", "c"}
+	dst := utils.AppendFromIndex(src, "a", 0)
+	fmt.Println(dst)
 }

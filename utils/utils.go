@@ -58,3 +58,11 @@ func IsInSlice(value, sli interface{}) bool {
 	}
 	return false
 }
+
+func AppendFromIndex(sli []string, value string, index int) []string {
+	sli = append(sli, "")
+	copy(sli[index+1:], sli[index:])
+	sli[index] = value
+
+	return sli
+}
