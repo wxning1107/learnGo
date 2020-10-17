@@ -17,6 +17,7 @@ require (
 	github.com/prometheus/common v0.10.0
 	github.com/rs/xid v1.2.1
 	github.com/samuel/go-zookeeper v0.0.0-20190923202752-2cc03de413da
+	github.com/satori/go.uuid v1.2.0
 	github.com/spf13/pflag v0.0.0-20170130214245-9ff6c6923cff // indirect
 	github.com/stretchr/testify v1.5.1
 	golang.org/x/net v0.0.0-20200813134508-3edf25e44fcc // indirect
