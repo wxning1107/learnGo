@@ -1,0 +1,131 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  labels:
+    project: '{{.ProjectName}}'
+    app: '{{.AppName}}'
+    version: '{{.CronJobVersion}}'
+    team: '{{.TeamLabel}}'
+  name: {{.CronJobVersion}}
+  namespace: {{.Namespace}}
+spec:
+  # 执行时间周期
+  schedule: "{{.Schedule}}"
+  # 并发执行策略，可用值有Allow、Forbid和Replace，用于定义前一次作业运行尚未完成时是否以及如何运行后一次的作业。Allow（默认）：允许并发运行 Job；Forbid：禁止并发运行，如果前一个还没有完成，则直接跳过下一个；Replace：取消当前正在运行的 Job，用一个新的来替换
+  concurrencyPolicy: {{.ConcurrencyPolicy}}
+  # 启动 Job 的期限
+  startingDeadlineSeconds: {{.StartingDeadlineSeconds}}
+  # 成功的任务执行保留的历史记录数
+  successfulJobsHistoryLimit: {{.SuccessfulJobsHistoryLimit}}
+  # 失败的任务执行保留的历史记录数
+  failedJobsHistoryLimit: {{.FailedJobsHistoryLimit}}
+  # 是否挂起后续的任务执行（true/false）
+  suspend: {{.Suspend}}
+  # job控制器模板，用于为cronjob控制器生成job对象
+  jobTemplate:
+    metadata:
+      labels:
+        project: '{{.ProjectName}}'
+        app: '{{.AppName}}'
+        team: '{{.TeamLabel}}'
+        version: '{{.CronJobVersion}}'
+    spec:
+      # 指定job失败后进行重试的次数。默认是6次
+      backoffLimit: 6
+      # 指定job需要成功运行Pods的次数。默认值: 1
+      completions: 1
+      # 指定job在任一时刻应该并发运行Pods的数量。默认值: 1
+      parallelism: 1
+      # 任务超时时间
+      {{if .ActiveDeadlineSeconds }}
+      # 指定job可运行的时间期限，超过时间还未结束，系统将会尝试进行终止。.spec.activeDeadlineSeconds要比.spec.backoffLimit优先级高，如果时间到了，但是backoffLimit还未到，该Job也会被强制停止。
+      activeDeadlineSeconds: {{.ActiveDeadlineSeconds}}
+      {{end}}
+      template:
+        metadata:
+          annotations:
+            {{range $key, $value := .PodAnnotations}}
+            {{$key}}: '{{$value}}'
+            {{end}}
+          labels:
+            project: '{{.ProjectName}}'
+            app: '{{.AppName}}'
+            team: '{{.TeamLabel}}'
+            version: '{{.CronJobVersion}}'
+            metrics: '{{.MetricsLabel}}'
+        spec:
+          containers:
+            - name: {{.ContainerName}}
+              image: {{.ImageName}}
+              env:
+                - name: aliyun_logs_{{.LogStoreName}}
+                  value: stdout
+                - name: aliyun_logs_{{.LogStoreName}}_ttl
+                  value: "15"
+                - name: aliyun_logs_{{.LogStoreName}}_shard
+                  value: "1"
+                {{range .Env}}
+                # 环境变量
+                - name: {{.Name}}
+                  value: "{{.Value}}"
+                {{end}}
+              {{if .CronCommand}}
+              # 实际运行指令，覆盖entrypoint
+              command: ["/bin/sh"]
+              args:
+                - -c
+                - {{.CronCommand}}
+              {{end}}
+              {{if .PreStopCommand}}
+              # 预停止指令
+              lifecycle:
+                preStop:
+                  exec:
+                    command:
+                      - sh
+                      - -c
+                      - "{{.PreStopCommand}}"
+              {{end}}
+              volumeMounts:
+                - mountPath: /etc/localtime
+                  name: tz-config
+                {{if .ConfigName}}
+                # 挂载到容器内到目录
+                - mountPath: /root/config
+                  # 引用数据卷名称，在下面volumes中定义
+                  name: app-config
+                {{end}}
+              resources:
+                # 资源限制
+                limits:
+                  # cpu限制，单位是core数，将用于docker run --cpu-shares参数
+                  cpu: {{.CpuLimit}}
+                  # 内存限制，单位可以是MiB、GiB等，将用于docker run --memory
+                  memory: {{.MemoryLimit}}
+                # 资源限制
+                requests:
+                  # cpu请求，单位是core数，容器启动时初始可用数量
+                  cpu: {{.CpuRequest}}
+                  # 内存请求，单位可以是MiB、GiB等，容器启动时初始可用数量
+                  memory: {{.MemoryRequest}}
+          # pull镜像时使用的secret名称
+          imagePullSecrets:
+            - name: qingtingfm
+          # pod重启策略，可选值为Always，OnFailure，默认Always。Always：Pod一旦终止运行，无论容器如何终止的，kubelet都将重启它。OnFailure：只有Pod以非0退出码终止时，kubelet才会重启容器，如果容器正常退出kubelet不会重启容器
+          restartPolicy: {{.RestartPolicy}}
+          terminationGracePeriodSeconds: {{.TerminationGracePeriodSeconds}}
+          # 该pod上定义的共享存储卷列表
+          volumes:
+            - # 挂载Pod所在宿主机目录
+            - hostPath:
+                path: /usr/share/zoneinfo/Asia/Shanghai
+                type: ""
+              name: tz-config
+            {{if .ConfigName}}
+            # 数据卷的名称
+            - name: app-config
+              # 类型为configMap的存储卷，表示挂载集群预定义的configMap对象到容器内部
+              configMap:
+                # configMap的名称
+                name: {{.ConfigName}}
+            {{end}}
