@@ -1,0 +1,201 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    project: '{{.ProjectName}}'
+    app: '{{.AppName}}'
+    version: '{{.DeploymentVersion}}'
+    team: '{{.TeamLabel}}'
+  name: {{.DeploymentVersion}}
+  namespace: {{.Namespace}}
+spec:
+  replicas: {{.Replicas}}
+  selector:
+    matchLabels:
+      project: '{{.ProjectName}}'
+      app: '{{.AppName}}'
+      version: '{{.DeploymentVersion}}'
+  strategy:
+    # 滚动升级策略
+    rollingUpdate:
+      # 升级过程中最多可以比原先设置多出的POD数量
+      maxSurge: 1
+      # 升级过程中最多有多少个POD处于无法提供服务的状态，当maxSurge不为0时，该值也不能为0
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        {{range $key, $value := .PodAnnotations}}
+        {{$key}}: '{{$value}}'
+        {{end}}
+      labels:
+        project: '{{.ProjectName}}'
+        app: '{{.AppName}}'
+        version: '{{.DeploymentVersion}}'
+        team: '{{.TeamLabel}}'
+        metrics: '{{.MetricsLabel}}'
+      name: {{.DeploymentVersion}}
+    spec:
+      containers:
+        - image: {{.ImageName}}
+          imagePullPolicy: IfNotPresent
+          name: {{.ContainerName}}
+          env:
+            - name: aliyun_logs_{{.LogStoreName}}
+              value: stdout
+            - name: aliyun_logs_{{.LogStoreName}}_ttl
+              value: "15"
+            - name: aliyun_logs_{{.LogStoreName}}_shard
+              value: "1"
+            {{range .Env}}
+            # 环境变量
+            - name: {{.Name}}
+              value: "{{.Value}}"
+            {{end}}
+          {{if .CoverCommand}}
+          # 实际运行指令，用于覆盖entrypoint
+          command: ["/bin/sh"]
+          args:
+            - -c
+            - {{.CoverCommand}}
+          {{end}}
+          {{if .PreStopCommand}}
+          # 预停止指令
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - sh
+                  - -c
+                  - "{{.PreStopCommand}}"
+          {{end}}
+          {{if .EnableHealth}}
+          # 健康检查
+          livenessProbe:
+            {{if ne .AppServiceType "GRPC"}}
+            httpGet:
+              port: {{.TargetPort}}
+              path: {{.HealthCheckUrl}}
+              scheme: HTTP
+            {{else}}
+            tcpSocket:
+              port: {{.TargetPort}}
+            {{end}}
+            # 第一次执行探针的时候要等待10秒，这样能够确保我们的容器能够有足够的时间启动起来
+            initialDelaySeconds: 10
+            # kubelet每隔10秒执行一次存活探针
+            periodSeconds: 10
+            # 探测失败后，最少连续探测成功多少次才被认定为成功。默认是 1，但是如果是`liveness`则必须是 1。最小值是 1。
+            successThreshold: 1
+            # 探测成功后，最少连续探测失败多少次才被认定为失败。默认是 3，最小值是 1。
+            failureThreshold: 5
+            # 健康检查发送请求后等待响应的超时时间
+            timeoutSeconds: 5
+          readinessProbe:
+            {{if ne .AppServiceType "GRPC"}}
+            httpGet:
+              port: {{.TargetPort}}
+              path: {{.HealthCheckUrl}}
+              scheme: HTTP
+            {{else}}
+            tcpSocket:
+              port: {{.TargetPort}}
+            {{end}}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 2
+            timeoutSeconds: 5
+          {{end}}
+          resources:
+            # 资源限制
+            limits:
+              # cpu限制，单位是core数，将用于docker run --cpu-shares参数
+              cpu: {{.CpuLimit}}
+              # 内存限制，单位可以是MiB、GiB等，将用于docker run --memory
+              memory: {{.MemoryLimit}}
+            # 资源限制
+            requests:
+              # cpu请求，单位是core数，容器启动时初始可用数量
+              cpu: {{.CpuRequest}}
+              # 内存请求，单位可以是MiB、GiB等，容器启动时初始可用数量
+              memory: {{.MemoryRequest}}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            # 挂载到容器内到目录
+            - mountPath: /etc/localtime
+              name: tz-config
+            {{if .ConfigName}}
+            # 配置中心文件挂载
+            - mountPath: /root/config
+              # 引用数据卷名称，在下面volumes中定义
+              name: app-config
+            {{end}}
+      {{if ne .AppServiceType "GRPC"}}
+      # 反亲和性
+      affinity:
+        # pod亲和性
+        podAntiAffinity:
+          # 必须满足指定的规则才可以调度Pod到Node上，功能和nodeSelector很像，相当于硬限制
+          # PreferredDuringSchedulingIgnoredDuringExecution：强调优先满足指定规则，调度器会尝试调度Pod到Node上，但并不强求，相当于软限制
+          # IgnoredDuringExecution意思是如果一个Pod所在节点在Pod运行期间标签发生变更，不再符合该Pod的节点亲和性需求，则系统将忽略Node上Label的变化，该Pod能继续在该节点运行
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  version: {{.DeploymentVersion}}
+              # 节点所属的topology范围
+              topologyKey: kubernetes.io/hostname
+      {{end}}
+      {{if eq .AppServiceType "GRPC"}}
+      # grpc dns
+      dnsPolicy: ClusterFirst
+      {{else}}
+      # restful dns
+      dnsPolicy: None
+      dnsConfig:
+        nameservers: ["169.254.20.10"]
+        searches:
+          - {{.Namespace}}.svc.cluster.local
+          - svc.cluster.local
+          - cluster.local
+        options:
+          - name: ndots
+            value: "2"
+      {{end}}
+      # pull镜像时使用的secret名称
+      imagePullSecrets:
+        - name: qingtingfm
+      # pod重启策略，可选值为Always，OnFailure，默认Always。Always：Pod一旦终止运行，无论容器如何终止的，kubelet都将重启它。OnFailure：只有Pod以非0退出码终止时，kubelet才会重启容器，如果容器正常退出kubelet不会重启容器
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      # 污点容忍
+      tolerations:
+        {{range $key, $value := .NodeSelector}}
+        - key: "{{$key}}"
+          operator: "Equal"
+          value: "{{$value}}"
+        {{end}}
+      # 节点筛选
+      nodeSelector:
+        {{range $key, $value := .NodeSelector}}
+        {{$key}}: {{$value}}
+        {{end}}
+      # 该pod上定义的共享存储卷列表
+      volumes:
+        # 挂载Pod所在宿主机目录
+        - hostPath:
+            path: /usr/share/zoneinfo/Asia/Shanghai
+            type: ""
+          name: tz-config
+        {{if .ConfigName}}
+        # 数据卷的名称
+        - name: app-config
+          # 类型为configMap的存储卷，表示挂载集群预定义的configMap对象到容器内部
+          configMap:
+            # configMap的名称
+            name: {{.ConfigName}}
+        {{end}}

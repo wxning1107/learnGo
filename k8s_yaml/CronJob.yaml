@@ -116,7 +116,7 @@ spec:
           terminationGracePeriodSeconds: {{.TerminationGracePeriodSeconds}}
           # 该pod上定义的共享存储卷列表
           volumes:
-            - # 挂载Pod所在宿主机目录
+            # 挂载Pod所在宿主机目录
             - hostPath:
                 path: /usr/share/zoneinfo/Asia/Shanghai
                 type: ""
