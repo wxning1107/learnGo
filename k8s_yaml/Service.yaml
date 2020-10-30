@@ -1,0 +1,50 @@
+# 阿里云文档:https://help.aliyun.com/document_detail/86531.html?spm=a2c4g.11186623.6.631.40b17b0c21XmG7
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: {{.Namespace}}
+  {{if ne .AppServiceType "GRPC"}}
+  # 阿里云负载均衡
+  annotations:
+    service.beta.kubernetes.io/alicloud-loadbalancer-address-type: "intranet"
+    service.beta.kubernetes.io/alicloud-loadbalancer-protocol-port: "{{.Protocol}}:80"
+    service.beta.kubernetes.io/alibaba-cloud-loadbalancer-delete-protection: "on"
+    service.beta.kubernetes.io/alibaba-cloud-loadbalancer-modification-protection: "ConsoleProtection"
+  {{end}}
+  name: {{.Name}}
+  labels:
+    project: '{{.ProjectName}}'
+    app: '{{.AppName}}'
+    tier: slb
+spec:
+  # Service需要暴露的端口号列表
+  ports:
+    # 映射端口
+    {{range .Ports}}
+    # 服务监听的端口号
+    - port: {{.ExternalPort}}
+      # 端口名称
+      name: "{{.Name}}"
+      # 端口协议，支持TCP和UDP，默认为TCP
+      protocol: {{.Protocol}}
+      # 需要转发到后段Pod的端口号
+      targetPort: {{.TargetPort}}
+    {{end}}
+  selector:
+    project: '{{.ProjectName}}'
+    app: '{{.AppName}}'
+  # 是否支持session，可选值为ClietIP，默认值为空.clientIP表示将同一个客户端（根据客户端IP地址决定）的访问请求都转发到同一个Pod
+  sessionAffinity: None
+  {{if eq .AppServiceType "GRPC"}}
+  # headless服务
+  # 虚拟服务IP地址，当type=ClusterIP时，如果不指定则系统会自动分配，也可以手动指定。当type=loadBalancer时则需要指定
+  clusterIP: None
+  {{else}}
+  # load balancer服务
+  # service的类型，指定service的访问方式，默认ClusterIP.
+  # ClusterIP：虚拟的服务ip地址，用于k8s集群内部的pod访问，在Node上kube-porxy通过设置的iptables规则进行转发
+  # NodePort：使用宿主机端口，能够访问各Node的外部客户端通过Node的IP和端口就能访问服务器
+  # LoadBalancer：使用外部负载均衡器完成到服务器的负载分发，需要在spec.status.loadBalancer字段指定外部负载均衡器的ip地址，并同时定义NodePort和ClusterIP用于公有云环境
+  type: {{.Type}}
+  externalTrafficPolicy: Local
+  {{end}}

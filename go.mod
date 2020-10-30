@@ -3,7 +3,9 @@ module learnGoSource
 go 1.14
 
 require (
+	github.com/cenk/backoff v2.2.1+incompatible // indirect
 	github.com/evanphx/json-patch v4.9.0+incompatible // indirect
+	github.com/facebookgo/clock v0.0.0-20150410010913-600d898af40a // indirect
 	github.com/go-redis/redis v6.15.8+incompatible
 	github.com/google/go-cmp v0.5.1 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
@@ -16,6 +18,7 @@ require (
 	github.com/prometheus/client_model v0.2.0
 	github.com/prometheus/common v0.10.0
 	github.com/rs/xid v1.2.1
+	github.com/rubyist/circuitbreaker v2.2.1+incompatible
 	github.com/samuel/go-zookeeper v0.0.0-20190923202752-2cc03de413da
 	github.com/satori/go.uuid v1.2.0
 	github.com/spf13/pflag v0.0.0-20170130214245-9ff6c6923cff // indirect
