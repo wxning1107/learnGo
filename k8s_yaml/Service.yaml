@@ -30,6 +30,7 @@ spec:
       # 需要转发到后段Pod的端口号
       targetPort: {{.TargetPort}}
     {{end}}
+  # 选择具有指定Label标签的Pod作为管理范围
   selector:
     project: '{{.ProjectName}}'
     app: '{{.AppName}}'
@@ -48,3 +49,11 @@ spec:
   type: {{.Type}}
   externalTrafficPolicy: Local
   {{end}}
+  # 当spec.type=LoadBalancer时，设置外部负载均衡器地址，用于公有云环境
+  status:
+    loadBalancer:
+      ingerss:
+        # 外部负载均衡器ip地址
+        ip: {.ip}
+        # 外部负载均衡器的主机名
+        hostname: {.hostname}
