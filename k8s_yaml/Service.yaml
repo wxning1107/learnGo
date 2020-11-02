@@ -21,13 +21,13 @@ spec:
   ports:
     # 映射端口
     {{range .Ports}}
-    # 服务监听的端口号
+    # 服务监听的端口号，也就是对外提供服务的端口
     - port: {{.ExternalPort}}
       # 端口名称
       name: "{{.Name}}"
       # 端口协议，支持TCP和UDP，默认为TCP
       protocol: {{.Protocol}}
-      # 需要转发到后段Pod的端口号
+      # 需要转发到后段Pod的端口号，也就是容器的端口
       targetPort: {{.TargetPort}}
     {{end}}
   # 选择具有指定Label标签的Pod作为管理范围
