@@ -1,0 +1,19 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: '{{.Name}}'
+  namespace: '{{.Namespace}}'
+  labels:
+    project: '{{.ProjectName}}'
+    app: '{{.AppName}}'
+spec:
+  rules:
+    # host可选，如果host不指定，该规则适用于通过指定IP入站的所有HTTP通信，如果指定了，则适用于该IP
+    - host: '{{.ServiceHost}}'
+      http:
+        paths:
+        # 路由列表
+        - path: /
+          backend: 
+            serviceName: '{{.ServiceName}}'
+            servicePort: 80

@@ -1,10 +1,22 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"math/rand"
+)
 
 func main() {
-	a := new(DescribeCronjobResp)
-	fmt.Println(a.Status.Name)
+	rand.Int()
+	c := make(chan int, 1)
+	close(c)
+	//c <- 2
+	select {
+	case v := <-c:
+		fmt.Println(v)
+	default:
+		fmt.Println("aaa")
+	}
+
 }
 
 type DescribeCronjobResp struct {
