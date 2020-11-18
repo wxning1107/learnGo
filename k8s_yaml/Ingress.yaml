@@ -7,6 +7,7 @@ metadata:
     project: '{{.ProjectName}}'
     app: '{{.AppName}}'
 spec:
+  # 用于定义当前Ingress资源的转发规则列表；由rules定义规则，或没有匹配到规则时，所有的流量会转发到由backend定义的默认后端。
   rules:
     # host可选，如果host不指定，该规则适用于通过指定IP入站的所有HTTP通信，如果指定了，则适用于该IP
     - host: '{{.ServiceHost}}'
@@ -14,6 +15,7 @@ spec:
         paths:
         # 路由列表
         - path: /
+          # 默认的后端用于服务那些没有匹配到任何规则的请求；定义Ingress资源时，必须要定义backend或rules两者之一，该字段用于让负载均衡器指定一个全局默认的后端。
           backend: 
             serviceName: '{{.ServiceName}}'
             servicePort: 80
