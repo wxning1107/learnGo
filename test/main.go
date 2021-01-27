@@ -2,10 +2,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/satori/go.uuid"
+	"math/rand"
+	"time"
 )
 
 func main() {
-	s := uuid.NewV4().String()
-	fmt.Println(s)
+	randMilliTime := rand.Intn(1000)
+	fmt.Println(time.Millisecond * time.Duration(randMilliTime))
+	fmt.Println(time.Millisecond*time.Duration(1000-randMilliTime) + time.Millisecond*time.Duration(randMilliTime))
 }
