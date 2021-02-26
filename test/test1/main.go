@@ -8,6 +8,10 @@ func main() {
 	fmt.Println("before main", head)
 	modify(head)
 	fmt.Println("after main", head)
+
+	m := make(map[string]string)
+	m["a"] = "a"
+	fmt.Printf("%#v\n", m["b"])
 }
 
 func modify(head *node) {
