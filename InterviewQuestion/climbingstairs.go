@@ -30,3 +30,23 @@ func iterationClimbingStairs(n int) int {
 
 	return ret
 }
+
+func iterationClimbingStairs2(n int) int {
+	if n == 1 {
+		return 1
+	}
+	if n == 2 {
+		return 2
+	}
+
+	stair := make(map[int]int, n)
+	stair[1] = 1
+	stair[2] = 2
+	res := 0
+	for i := 3; i <= n; i++ {
+		res = stair[i-1] + stair[i-2]
+		stair[i] = res
+	}
+
+	return res
+}
