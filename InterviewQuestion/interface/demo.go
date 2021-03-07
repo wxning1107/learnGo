@@ -2,6 +2,8 @@ package main
 
 import "fmt"
 
+var _ StringAble = (*Country)(nil)
+
 type StringAble interface {
 	ToString() string
 }
@@ -9,6 +11,7 @@ type StringAble interface {
 type Country struct {
 	Name string
 }
+
 type City struct {
 	Name string
 }
@@ -16,6 +19,7 @@ type City struct {
 func (c Country) ToString() string {
 	return "Country = " + c.Name
 }
+
 func (c City) ToString() string {
 	return "City = " + c.Name
 }
