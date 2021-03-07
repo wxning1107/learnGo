@@ -1,5 +1,11 @@
 package main
 
+import "fmt"
+
+func main() {
+	fmt.Println(mergeSort([]int{3, 5, 8, 1, 4, 6, 9, 2}))
+}
+
 // merge sort
 // Time complexity: O(nlogn), Space Complexity: O(n)
 func mergeSort(source []int) []int {

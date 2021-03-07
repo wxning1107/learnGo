@@ -1,5 +1,13 @@
 package main
 
+import "fmt"
+
+func main() {
+	fmt.Println(recursiveClimbingStairs(10))
+	fmt.Println(iterationClimbingStairs(10))
+	fmt.Println(iterationClimbingStairs2(10))
+}
+
 func recursiveClimbingStairs(n int) int {
 	if n == 1 {
 		return 1
