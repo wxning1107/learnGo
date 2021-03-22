@@ -3,7 +3,10 @@ package main
 import "fmt"
 
 func main() {
-	fmt.Println(mergeSort([]int{3, 5, 8, 1, 4, 6, 9, 2}))
+	data := []int{3, 5, 8, 1, 4, 6, 9, 2}
+	fmt.Println(mergeSort(data))
+	quickSort(data, 0, 7)
+	fmt.Println(data)
 }
 
 // merge sort
@@ -35,4 +38,24 @@ func merge(left, right []int) []int {
 	res = append(res, right[j:]...)
 
 	return res
+}
+
+// quick sort
+func quickSort(data []int, p, r int) {
+	if p >= r {
+		return
+	}
+
+	pivot := data[r]
+	i := p
+	for j := p; j < r; j++ {
+		if data[j] < pivot {
+			data[i], data[j] = data[j], data[i]
+			i++
+		}
+	}
+	data[i], data[r] = data[r], data[i]
+
+	quickSort(data, p, i-1)
+	quickSort(data, i+1, r)
 }
