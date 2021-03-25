@@ -9,7 +9,7 @@ func main() {
 func binarySearch(a []int, target int) int {
 	low, high := 0, len(a)
 
-	for low < high {
+	for low <= high {
 		mid := (low + high) >> 1
 		if a[mid] < target {
 			low = mid + 1
