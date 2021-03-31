@@ -10,7 +10,7 @@ func main() {
 }
 
 // merge sort
-// Time complexity: O(nlogn), Space Complexity: O(n)
+// Time complexity: O(nlogn), Space Complexity: O(n), 算法复杂度可以联想递归树, 树高是log以2为底n的对数, 每一层的消耗为n
 func mergeSort(source []int) []int {
 	if len(source) < 2 {
 		return source
