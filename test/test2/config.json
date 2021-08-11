@@ -1,0 +1,8 @@
+{
+  "test": "!include:common/host/prd.yaml@qdns",
+  "common": {
+    "a": "b",
+    "b": 2,
+    "c": "!include:common/host/prd.yaml@qdns"
+  }
+}

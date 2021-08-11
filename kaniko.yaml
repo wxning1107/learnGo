@@ -1,0 +1,50 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kaniko
+  namespace: kaniko
+spec:
+  containers:
+    - name: kaniko
+      image: gcr.io/kaniko-project/executor:latest
+      args:
+        - "--dockerfile=Dockerfile"
+        - "--context=/demo"
+        - "--destination=wangning/kaniko-demo:v1"
+      volumeMounts:
+        - name: kaniko-secret
+          mountPath: /kaniko/.docker/
+      env:
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /secret/kaniko-secret.json
+  restartPolicy: Never
+  nodeSelector:
+    qingting.fm/importance: special
+    qingting.fm/exclusive-deployment: jenkins
+  volumes:
+    - name: kaniko-secret
+      secret:
+        secretName: kaniko-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kaniko-svc
+  namespace: kaniko
+  annotations:
+    service.beta.kubernetes.io/alicloud-loadbalancer-address-type: "intranet"
+    service.beta.kubernetes.io/alicloud-loadbalancer-protocol-port: "http:80"
+    service.beta.kubernetes.io/alibaba-cloud-loadbalancer-delete-protection: "on"
+  labels:
+    app: kaniko-svc
+spec:
+  selector:
+    app: kaniko-svc
+  type: LoadBalancer
+  sessionAffinity: None
+  externalTrafficPolicy: Local
+  ports:
+    - name: web
+      port: 80
+      targetPort: 80

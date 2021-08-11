@@ -1,0 +1,169 @@
+env: 'prd'
+
+ali:
+  accessKeyID: !include:private/token/token.yaml@ali_ams_access_key_id
+  accessKeySecret: !include:private/token/token.yaml@ali_ams_access_key_secret
+  regionID: cn-hangzhou
+  logEndpoint: cn-hangzhou-intranet.log.aliyuncs.com
+git:
+  host: https://git2.qingtingfm.com
+  token: !include:private/token/token.yaml@git_webapi_qingting
+  ciToken: !include:private/token/token.yaml@git_ci_token
+jwt:
+  signKey: !include:private/token/token.yaml@jwt_ams_sign_key
+  k8sSystemUserTokens: !include:private/token/token.yaml@jwt_ams_k8s_system_token
+k8s:
+  kubeConfigPath: !include:private/tls/k8s.yaml@prd_config_path
+  stgContextName: 'k8s-stg'
+  prdContextName: 'k8s-prd'
+k8sClusters:
+  fat: !include:projects/ams/k8s/clusters.yaml@k8s-stg-brox
+  stg: !include:projects/ams/k8s/clusters.yaml@k8s-stg-brox
+  pre: !include:projects/ams/k8s/clusters.yaml@k8s-prd-brox
+  prd: !include:projects/ams/k8s/clusters.yaml@k8s-prd-brox
+cm:
+  host: "http://config-manager.qingting-hz.com"
+  token: !include:private/token/token.yaml@config_manager_access_token
+other:
+  grafanaStg: "http://qt-grafana.qingting-hz.com"
+  grafanaPrd: "http://qt-grafana.qingting-hz.com"
+  k8sStgClusterID: "c048d5eb4c0f3420ab06df685a5525d71"
+  k8sPrdClusterID: "c0a79118cf02142359fdeb59cd29074dc"
+  aliSlsConsoleUrl: "https://sls.console.aliyun.com"
+  aliLogProjectStgName: "k8s-stg"
+  aliLogProjectPrdName: "k8s-prd"
+  aliSlbConsoleUrl: "https://slb.console.aliyun.com"
+  aliK8sConsoleUrl: "https://cs.console.aliyun.com/k8s"
+  amsHost: !include:common/host/prd.yaml@ams
+  amsFrontendHost: !include:common/host/prd.yaml@ams_frontend_host
+  configCenter:
+    projectID: 1613
+    branch: master
+  internalUserHost: http://internal-user-system-api.prd.svc.qt-k8s-hz.com
+jenkins:
+  baseURL: http://qt-jenkins.qingtingfm.com
+  crowd:
+    userName: amsci
+    password: !include:private/password/password.yaml@jenkins_ci_crowd
+    checkPath: "/j_spring_security_check"
+    identifyContent: Authentication required
+jenkinsCI:
+  gitlabSecretToken: !include:private/token/token.yaml@jenkins_ci_prd_gitlab_secret_token
+  pipelineBranch: master
+  scriptPath: entry/CI
+  gitLabConnection: git-amsci
+  pipelineURL: git@git2.qingtingfm.com:test/common-pipeline-library.git
+  pipelineCredentialsID: git2-amsci
+  goJenkins:
+    baseURL: http://qt-jenkins.qingtingfm.com
+    crowd:
+      checkPath: "/j_spring_security_check"
+      identifyContent: Authentication required
+      password: !include:private/password/password.yaml@jenkins_ci_crowd
+      userName: amsci
+prometheus:
+  stgHost: "http://172.22.36.114:9090/"
+  prdHost: "http://172.22.11.211:9090/"
+  stgContainerLabelName: "container"
+  prdContainerLabelName: "container_name"
+
+gin: !include:common/gin/log.yaml,common/gin/app.yaml
+  timeout: '60s'
+  requestBodyOut: true
+
+log: !include:common/log/log.yaml
+
+goroutine: !include:common/goroutine/log.yaml
+
+trace: !include:common/trace/log.yaml,common/trace/app.yaml
+  appName: 'ams-prd'
+
+httpClient: !include:common/httpclient/log.yaml,common/httpclient/app.yaml
+  requestBodyOut: true
+  responseBodyOut: true
+  requestTimeout: '15s'
+  disableBreaker: true
+
+apolloStgMysql: !include:common/mysql/log.yaml,common/mysql/app.yaml
+  dsn: !include:common/mysql/rm-bp1u8w3578u7md9e0.yaml@basic/account/ams
+    dbName: 'apolloconfigdb_stg'
+    endpoint: !include:common/mysql/rm-bp1u8w3578u7md9e0.yaml@basic/endpoint
+    options: !include:common/mysql/rm-bp1u8w3578u7md9e0.yaml@basic/options
+  stdout: true
+
+apolloPrdMysql: !include:common/mysql/log.yaml,common/mysql/app.yaml
+  dsn: !include:common/mysql/rm-bp1u8w3578u7md9e0.yaml@basic/account/ams
+    dbName: 'apolloconfigdb'
+    endpoint: !include:common/mysql/rm-bp1u8w3578u7md9e0.yaml@basic/endpoint
+    options: !include:common/mysql/rm-bp1u8w3578u7md9e0.yaml@basic/options
+  stdout: true
+
+apollo:
+  stgHost: "http://apollo-config.staging.cloud.qingting-hz.com"
+  prdHost: "http://apollo-config.cloud.qingting-hz.com"
+
+mongo: !include:common/mongo/log.yaml,common/mongo/app.yaml
+  dsn: !include:common/mongo/dds-bp19f2a965a78474.yaml@basic/account/ams
+    dbName: 'ams_prd'
+    endpoints: !include:common/mongo/dds-bp19f2a965a78474.yaml@basic/endpoints
+    options: !include:common/mongo/dds-bp19f2a965a78474.yaml@basic/options
+
+redis: !include:common/redis/log.yaml,common/redis/app.yaml,common/redis/r-bp12pt1wugsg4mpf7f.yaml@basic
+  db: 1
+
+redlock: !include:common/redlock/log.yaml,common/redlock/app.yaml
+  expiryTime: "15s"
+
+sentrySystem:
+  authToken: !include:private/token/token.yaml@sentry_ams_auth_token
+  organization: sentry
+  host: https://sentry.qingtingfm.com
+
+kong:
+  hosts:
+    - http://kong-stg.qingting-hz.com:8001
+    - http://konga-main.qingting-hz.com:8001
+    - http://portal-admin.qingting-hz.com:8001
+
+kafka:
+  appOpMsg: !include:common/kafka/data-kafka.yaml@basic
+    appID: ams
+    stdout: true
+    version: 2.2.0
+    consumer: !include:common/kafka/app.yaml@consumer
+  dingApproval: !include:common/kafka/data-kafka.yaml@dingtalk
+    appID: dingtalk
+    stdout: true
+    version: 2.2.0
+    consumer: !include:common/kafka/app.yaml@consumer
+kafkaProducer: !include:common/kafka/data-kafka.yaml@basic
+  appID: ams
+  producer: !include:common/kafka/app.yaml@producer
+  stdout: true
+  version: 2.2.0
+dingtalk:
+  host: !include:common/host/prd.yaml@dingtalk
+  token: !include:private/token/token.yaml@ams_dingtalk_token
+  app: project_approval
+  groupTokens:
+    p0_deploy: !include:private/token/token.yaml@ams_dingtalk_token_p0_deploy
+    urgent_deploy: !include:private/token/token.yaml@ams_dingtalk_token_urgent_deploy
+  approval:
+    processCode: "PROC-3E504479-6AFD-4897-BABA-1BE0E5B4E811"
+appOpConsumer:
+  topic: AmsAppOpMsg
+  groupID: appOpMsg
+coldStorage:
+  ossStgBucket: 'k8s-stg-log-cold'
+  ossPrdBucket: 'k8s-prd-log-cold'
+  roleArn: 'acs:ram::1378641383022900:role/aliyunlogdefaultrole'
+  compressType: 'none'
+  bufferInterval: 300
+  bufferSize: 256
+  pathFormat: 'event_date=%Y-%m-%d/hour=%H/%M'
+  format: 'json'
+qdns:
+  host: !include:common/host/prd.yaml@qdns
+approvalConsumer:
+  topic: dingtalk_prod
+  groupID: dingApproval

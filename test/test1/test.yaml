@@ -1,0 +1,247 @@
+ali:
+  accessKeyID: '@private/token/token.yaml@ali_ams_access_key_id'
+  accessKeySecret: '@private/token/token.yaml@ali_ams_access_key_secret'
+  logEndpoint: cn-hangzhou-intranet.log.aliyuncs.com
+  regionID: cn-hangzhou
+apollo:
+  prdHost: http://apollo-config.cloud.qingting-hz.com
+  stgHost: http://apollo-config.staging.cloud.qingting-hz.com
+apolloPrdMysql:
+  active: 40
+  dsn:
+    dbName: apolloconfigdb
+    endpoint:
+      address: rm-bp1u8w3578u7md9e0.mysql.rds.aliyuncs.com
+      port: 3306
+    options:
+      - charset=utf8mb4
+      - readTimeout=30s
+      - writeTimeout=30s
+      - timeout=30s
+      - parseTime=true
+      - loc=Local
+    password: '@private/password/password.yaml@mysql_rm-bp1u8w3578u7md9e0_ams'
+    userName: ams
+  execTimeout: 2s
+  idle: 20
+  idleTimeout: 4h
+  queryTimeout: 2s
+  stdout: true
+  tranTimeout: 2s
+apolloStgMysql:
+  active: 40
+  dsn:
+    dbName: apolloconfigdb_stg
+    endpoint:
+      address: rm-bp1u8w3578u7md9e0.mysql.rds.aliyuncs.com
+      port: 3306
+    options:
+      - charset=utf8mb4
+      - readTimeout=30s
+      - writeTimeout=30s
+      - timeout=30s
+      - parseTime=true
+      - loc=Local
+    password: '@private/password/password.yaml@mysql_rm-bp1u8w3578u7md9e0_ams'
+    userName: ams
+  execTimeout: 2s
+  idle: 20
+  idleTimeout: 4h
+  queryTimeout: 2s
+  stdout: true
+  tranTimeout: 2s
+appOpConsumer:
+  groupID: appOpMsg
+  topic: AmsAppOpMsg
+cm:
+  host: http://config-manager.qingting-hz.com
+  token: '@private/token/token.yaml@config_manager_access_token'
+coldStorage:
+  bufferInterval: 300
+  bufferSize: 256
+  compressType: none
+  format: json
+  ossPrdBucket: k8s-prd-log-cold
+  ossStgBucket: k8s-stg-log-cold
+  pathFormat: event_date=%Y-%m-%d/hour=%H/%M
+  roleArn: acs:ram::1378641383022900:role/aliyunlogdefaultrole
+dingtalk:
+  app: project_approval
+  groupTokens:
+    p0_deploy: '@private/token/token.yaml@ams_dingtalk_token_p0_deploy'
+  host: http://dingtalk.qingting-hz.com
+  token: '@private/token/token.yaml@ams_dingtalk_token'
+env: prd
+gin:
+  endpoint:
+    address: 0.0.0.0
+    port: 80
+  requestBodyOut: true
+  stdout: true
+  timeout: 60s
+git:
+  ciToken: '@private/token/token.yaml@git_ci_token'
+  host: https://git2.qingtingfm.com
+  token: '@private/token/token.yaml@git_webapi_qingting'
+goroutine:
+  stdout: true
+grayIngressConfig:
+  fat:
+    isChangeLBService: true
+    isDeletePrivateZoneRecord: true
+    isGrayIngress: true
+  prd:
+    isChangeLBService: false
+    isDeletePrivateZoneRecord: true
+    isGrayIngress: true
+  pre:
+    isChangeLBService: true
+    isDeletePrivateZoneRecord: true
+    isGrayIngress: true
+  stg:
+    isChangeLBService: true
+    isDeletePrivateZoneRecord: true
+    isGrayIngress: true
+httpClient:
+  disableBreaker: true
+  disableKeepAlives: false
+  enableLoadBalancer: true
+  idleConnTimeout: 90s
+  maxConnsPerHost: 0
+  maxIdleConns: 100
+  maxIdleConnsPerHost: 2
+  requestBodyOut: true
+  requestTimeout: 15s
+  responseBodyOut: true
+  stdout: true
+jenkins:
+  baseURL: http://qt-jenkins.qingtingfm.com
+  crowd:
+    checkPath: /j_spring_security_check
+    identifyContent: Authentication required
+    password: '@private/password/password.yaml@jenkins_ci_crowd'
+    userName: amsci
+jenkinsCI:
+  baseURL: https://jenkins.qingtingfm.com
+  basicAuth:
+    password: '@private/password/password.yaml@jenkins_ci_basic_auth'
+    userName: jenkins
+  crowd:
+    identifyContent: Authentication required
+    password: '@private/password/password.yaml@jenkins_ci_crowd'
+    userName: amsci
+jwt:
+  k8sSystemUserTokens: '@private/token/token.yaml@jwt_ams_k8s_system_token'
+  signKey: '@private/token/token.yaml@jwt_ams_sign_key'
+k8s:
+  kubeConfigPath: '@private/tls/k8s.yaml@prd_config_path'
+  prdContextName: k8s-prd
+  stgContextName: k8s-stg
+kafka:
+  appOpMsg:
+    appID: ams
+    consumer:
+      initialOffset: -1
+      maxProcessingTime: 500ms
+      returnError: true
+    endpoints:
+      - address: data-kafka001.data-hz.com
+        port: 9092
+      - address: data-kafka002.data-hz.com
+        port: 9092
+      - address: data-kafka003.data-hz.com
+        port: 9092
+    stdout: true
+    version: 2.2.0
+kafkaProducer:
+  appID: ams
+  endpoints:
+    - address: data-kafka001.data-hz.com
+      port: 9092
+    - address: data-kafka002.data-hz.com
+      port: 9092
+    - address: data-kafka003.data-hz.com
+      port: 9092
+  producer:
+    requiredAckTimeout: 10s
+    returnError: true
+    returnSuccess: true
+  stdout: true
+  version: 2.2.0
+kong:
+  hosts:
+    - http://kong-stg.qingting-hz.com:8001
+    - http://konga-main.qingting-hz.com:8001
+    - http://portal-admin.qingting-hz.com:8001
+log:
+  stdout: true
+mongo:
+  dsn:
+    dbName: ams_prd
+    endpoints:
+      - address: dds-bp19f2a965a784741.mongodb.rds.aliyuncs.com
+        port: 3717
+      - address: dds-bp19f2a965a784742.mongodb.rds.aliyuncs.com
+        port: 3717
+    options:
+      - replicaSet=mgset-25604411
+    password: '@private/password/password.yaml@mongo_dds-bp19f2a965a78474_ams'
+    userName: ams
+  execTimeout: 1000ms
+  idleTimeout: 4h
+  maxPoolSize: 40
+  minPoolSize: 0
+  queryTimeout: 500ms
+  stdout: true
+other:
+  aliK8sConsoleUrl: https://cs.console.aliyun.com/k8s
+  aliLogProjectPrdName: k8s-prd
+  aliLogProjectStgName: k8s-stg
+  aliSlbConsoleUrl: https://slb.console.aliyun.com
+  aliSlsConsoleUrl: https://sls.console.aliyun.com
+  amsFrontendHost: https://rd-ams.qingtingfm.com
+  amsHost: http://ams-backend.qingting-hz.com
+  configCenter:
+    branch: master
+    projectID: 1613
+  grafanaPrd: http://qt-grafana.qingting-hz.com
+  grafanaStg: http://qt-grafana.qingting-hz.com
+  k8sPrdClusterID: c0a79118cf02142359fdeb59cd29074dc
+  k8sStgClusterID: c048d5eb4c0f3420ab06df685a5525d71
+prometheus:
+  prdContainerLabelName: container_name
+  prdHost: http://172.22.11.211:9090/
+  stgContainerLabelName: container
+  stgHost: http://172.22.36.114:9090/
+redis:
+  active: 40
+  auth: '@private/password/password.yaml@redis_r-bp12pt1wugsg4mpf7f'
+  connectTimeout: 10s
+  db: 1
+  endpoint:
+    address: r-bp12pt1wugsg4mpf7f.redis.rds.aliyuncs.com
+    port: 6379
+  idle: 20
+  idleTimeout: 4h
+  maxConnLifetime: 4h
+  proto: tcp
+  readTimeout: 3s
+  stdout: true
+  wait: false
+  writeTimeout: 3s
+redlock:
+  expiryTime: 5s
+  retryDelay: 50ms
+  stdout: true
+  tries: 50
+sentrySystem:
+  authToken: '@private/token/token.yaml@sentry_ams_auth_token'
+  host: https://sentry.qingtingfm.com
+  organization: sentry
+trace:
+  appName: ams-prd
+  reporter:
+    collectorEndpoint: http://tracing-analysis-dc-hz-internal.aliyuncs.com/adapt_dkor3vzi2c@ca927e8b4abd39c_dkor3vzi2c@53df7ad2afe8301/api/v2/spans
+  sampler:
+    param: "0.01"
+  stdout: true
