@@ -2,6 +2,7 @@ package main
 
 import "fmt"
 
+// 校验Country是否实现StringAble接口
 var _ StringAble = (*Country)(nil)
 
 type StringAble interface {
