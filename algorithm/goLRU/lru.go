@@ -58,15 +58,19 @@ func (cache *Cache) Get(key string) interface{} {
 }
 
 func (cache *Cache) moveToHead(entry *Entry) {
+	// 已经在队列头，直接返回
 	if entry == cache.head {
 		return
 	}
 
+	// 移除这个entry
 	entry.pre.next = entry.next
 
 	if entry == cache.tail {
+		// 更新cache.tail
 		cache.tail = entry.pre
 	} else {
+		// 更新下一个entry的pre
 		entry.next.pre = entry.pre
 	}
 
